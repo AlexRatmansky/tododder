@@ -4,6 +4,12 @@ import { db } from '../util/admin';
 import { config } from '../util/config';
 import { validateLoginData, validateSignUpData } from '../util/validators';
 
+interface UserRequest extends Request {
+  user: {
+    username: string;
+  };
+}
+
 firebase.initializeApp(config);
 
 // SignUp
@@ -79,4 +85,36 @@ export const loginUser = (request: Request, response: Response) => {
       console.error(error);
       return response.status(403).json({ general: 'wrong credentials, please try again' });
     });
+};
+
+export const getUserDetail = async (request: UserRequest, response: Response) => {
+  let userData: any = {};
+
+  try {
+    const user = await db.doc(`/users/${request.user.username}`).get();
+
+    if (user.exists) {
+      userData.userCredentials = user.data();
+      return response.json(userData);
+    }
+  } catch (error) {
+    console.error(error);
+    return response.status(500).json({ error: error.code });
+  }
+};
+
+export const updateUserDetails = async (request: UserRequest, response: Response) => {
+  try {
+    await db
+      .collection('users')
+      .doc(`${request.user.username}`)
+      .update(request.body);
+
+    response.json({ message: 'Updated successfully' });
+  } catch (error) {
+    console.error(error);
+    return response.status(500).json({
+      message: 'Cannot Update the value',
+    });
+  }
 };

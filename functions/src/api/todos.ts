@@ -10,8 +10,15 @@ interface Todo {
 
 type Todos = Array<Todo>;
 
-export const getAllTodos = (request: Request, response: Response) => {
+interface UserRequest extends Request {
+  user: {
+    username: string;
+  };
+}
+
+export const getAllTodos = (request: UserRequest, response: Response) => {
   db.collection('todos')
+    .where('username', '==', request.user.username)
     .orderBy('createdAt', 'desc')
     .get()
     .then(data => {
@@ -34,7 +41,7 @@ export const getAllTodos = (request: Request, response: Response) => {
     });
 };
 
-export const postOneTodo = (request: Request, response: Response) => {
+export const postOneTodo = (request: UserRequest, response: Response) => {
   if (request.body.body.trim() === '') {
     return response.status(400).json({ body: 'Must not be empty' });
   }
@@ -48,6 +55,7 @@ export const postOneTodo = (request: Request, response: Response) => {
     title: request.body.title,
     body: request.body.body,
     createdAt: new Date().toISOString(),
+    username: request.user.username,
   };
 
   db.collection('todos')
@@ -63,24 +71,27 @@ export const postOneTodo = (request: Request, response: Response) => {
     });
 };
 
-export const deleteTodo = (request: Request, response: Response) => {
-  const todo = db.collection('todos').doc(request.params.todoId);
+export const deleteTodo = async (request: UserRequest, response: Response) => {
+  try {
+    const todo = await db.collection('todos').doc(request.params.todoId);
 
-  todo
-    .get()
-    .then(doc => {
-      if (!doc.exists) {
-        response.status(404).json({ error: 'Todo not found' });
-      }
-      return todo.delete();
-    })
-    .then(() => {
-      response.json({ message: 'Delete successful' });
-    })
-    .catch(err => {
-      console.error(err);
-      return response.status(500).json({ error: err.code });
-    });
+    const todoDoc = await todo.get();
+
+    if (!todoDoc.exists) {
+      return response.status(404).json({ error: 'Todo not found' });
+    }
+
+    if (todoDoc.data().username !== request.user.username) {
+      return response.status(403).json({ error: 'UnAuthorized' });
+    }
+
+    await todo.delete();
+
+    return response.json({ message: 'Delete successful' });
+  } catch (error) {
+    console.error(error);
+    return response.status(500).json({ error: error.code });
+  }
 };
 
 export const editTodo = (request: Request, response: Response) => {
