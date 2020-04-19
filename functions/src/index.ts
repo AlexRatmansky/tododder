@@ -1,8 +1,13 @@
 import * as functions from 'firebase-functions';
 import { deleteTodo, editTodo, getAllTodos, postOneTodo } from './api/todos';
+import { loginUser } from './api/users';
 
 const app = require('express')();
 
+// Users
+app.post('/login', loginUser);
+
+// Todos
 app.get('/todos', getAllTodos);
 app.post('/todo', postOneTodo);
 app.post('/todo/:todoId', editTodo);
