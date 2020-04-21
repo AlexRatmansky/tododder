@@ -3,13 +3,10 @@ import React, { Component } from 'react';
 import withStyles from '@material-ui/core/styles/withStyles';
 import Typography from '@material-ui/core/Typography';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import CloudUploadIcon from '@material-ui/icons/CloudUpload';
-import { Card, CardActions, CardContent, Divider, Button, Grid, TextField } from '@material-ui/core';
-
-import clsx from 'clsx';
+import { Button, Card, CardActions, CardContent, Divider, Grid, TextField } from '@material-ui/core';
 
 import axios from 'axios';
-import { authMiddleWare } from '../util/auth';
+import { authMiddleWare } from '../../util/auth';
 
 const styles = theme => ({
   content: {
@@ -34,7 +31,7 @@ const styles = theme => ({
     position: 'absolute',
     top: '50%',
   },
-  uiProgess: {
+  uiProgress: {
     position: 'fixed',
     zIndex: '1000',
     height: '31px',
@@ -70,7 +67,6 @@ class Account extends Component {
       phoneNumber: '',
       username: '',
       country: '',
-      profilePicture: '',
       uiLoading: true,
       buttonLoading: false,
       imageError: '',
@@ -110,44 +106,6 @@ class Account extends Component {
     });
   };
 
-  handleImageChange = event => {
-    this.setState({
-      image: event.target.files[0],
-    });
-  };
-
-  profilePictureHandler = event => {
-    event.preventDefault();
-    this.setState({
-      uiLoading: true,
-    });
-    authMiddleWare(this.props.history);
-    const authToken = localStorage.getItem('AuthToken');
-    let form_data = new FormData();
-    form_data.append('image', this.state.image);
-    form_data.append('content', this.state.content);
-    axios.defaults.headers.common = { Authorization: `${authToken}` };
-    axios
-      .post('/user/image', form_data, {
-        headers: {
-          'content-type': 'multipart/form-data',
-        },
-      })
-      .then(() => {
-        window.location.reload();
-      })
-      .catch(error => {
-        if (error.response.status === 403) {
-          this.props.history.push('/login');
-        }
-        console.log(error);
-        this.setState({
-          uiLoading: false,
-          imageError: 'Error in posting the data',
-        });
-      });
-  };
-
   updateFormValues = event => {
     event.preventDefault();
     this.setState({ buttonLoading: true });
@@ -181,38 +139,20 @@ class Account extends Component {
       return (
         <main className={classes.content}>
           <div className={classes.toolbar} />
-          {this.state.uiLoading && <CircularProgress size={150} className={classes.uiProgess} />}
+          {this.state.uiLoading && <CircularProgress size={150} className={classes.uiProgress} />}
         </main>
       );
     } else {
       return (
         <main className={classes.content}>
           <div className={classes.toolbar} />
-          <Card {...rest} className={clsx(classes.root, classes)}>
+          <Card {...rest} className={classes.root}>
             <CardContent>
               <div className={classes.details}>
                 <div>
                   <Typography className={classes.locationText} gutterBottom variant="h4">
                     {this.state.firstName} {this.state.lastName}
                   </Typography>
-                  <Button
-                    variant="outlined"
-                    color="primary"
-                    type="submit"
-                    size="small"
-                    startIcon={<CloudUploadIcon />}
-                    className={classes.uploadButton}
-                    onClick={this.profilePictureHandler}
-                  >
-                    {'Upload Photo'}
-                  </Button>
-                  <input type="file" onChange={this.handleImageChange} />
-
-                  {this.state.imageError && (
-                    <div className={classes.customError}>
-                      {'Wrong Image Format || Supported Format are PNG and JPG'}
-                    </div>
-                  )}
                 </div>
               </div>
               <div className={classes.progress} />
@@ -221,7 +161,7 @@ class Account extends Component {
           </Card>
 
           <br />
-          <Card {...rest} className={clsx(classes.root, classes)}>
+          <Card {...rest} className={classes.root}>
             <form autoComplete="off" noValidate>
               <Divider />
               <CardContent>
@@ -310,8 +250,8 @@ class Account extends Component {
             onClick={this.updateFormValues}
             disabled={this.state.buttonLoading || !this.state.firstName || !this.state.lastName || !this.state.country}
           >
-            {'Save details'}
-            {this.state.buttonLoading && <CircularProgress size={30} className={classes.progess} />}
+            Save details
+            {this.state.buttonLoading && <CircularProgress size={30} className={classes.progress} />}
           </Button>
         </main>
       );

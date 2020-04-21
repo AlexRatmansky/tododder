@@ -1,5 +1,5 @@
 import * as functions from 'firebase-functions';
-import { deleteTodo, editTodo, getAllTodos, postOneTodo } from './api/todos';
+import { deleteTodo, editTodo, getAllTodos, getOneTodo, postOneTodo } from './api/todos';
 import { getUserDetail, loginUser, signUpUser, updateUserDetails } from './api/users';
 import { auth } from './util/auth';
 
@@ -13,6 +13,7 @@ app.post('/user', auth, updateUserDetails);
 
 // Todos
 app.get('/todos', auth, getAllTodos);
+app.get('/todo/:todoId', auth, getOneTodo);
 app.post('/todo', auth, postOneTodo);
 app.post('/todo/:todoId', auth, editTodo);
 app.delete('/todo/:todoId', auth, deleteTodo);

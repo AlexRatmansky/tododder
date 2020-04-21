@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-
-import Account from '../components/Account';
-import Todo from '../components/Todo';
-
+import Account from '../../components/Account';
+import Todo from '../../components/Todo';
 import Drawer from '@material-ui/core/Drawer';
 import AppBar from '@material-ui/core/AppBar';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -17,11 +15,9 @@ import ListItemText from '@material-ui/core/ListItemText';
 import withStyles from '@material-ui/core/styles/withStyles';
 import AccountBoxIcon from '@material-ui/icons/AccountBox';
 import NotesIcon from '@material-ui/icons/Notes';
-import Avatar from '@material-ui/core/Avatar';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import CircularProgress from '@material-ui/core/CircularProgress';
-
-import { authMiddleWare } from '../util/auth';
+import { authMiddleWare } from '../../util/auth';
 
 const drawerWidth = 240;
 
@@ -55,7 +51,7 @@ const styles = theme => ({
     zIndex: '1000',
     height: '31px',
     width: '31px',
-    left: '50%',
+    left: '45%',
     top: '35%',
   },
   toolbar: theme.mixins.toolbar,
@@ -66,15 +62,15 @@ class Home extends Component {
     render: false,
   };
 
-  loadAccountPage = event => {
+  loadAccountPage = () => {
     this.setState({ render: true });
   };
 
-  loadTodoPage = event => {
+  loadTodoPage = () => {
     this.setState({ render: false });
   };
 
-  logoutHandler = event => {
+  logoutHandler = () => {
     localStorage.removeItem('AuthToken');
     this.props.history.push('/login');
   };
@@ -85,7 +81,6 @@ class Home extends Component {
     this.state = {
       firstName: '',
       lastName: '',
-      profilePicture: '',
       uiLoading: true,
       imageLoading: false,
     };
@@ -107,7 +102,6 @@ class Home extends Component {
           country: response.data.userCredentials.country,
           username: response.data.userCredentials.username,
           uiLoading: false,
-          profilePicture: response.data.userCredentials.imageUrl,
         });
       })
       .catch(error => {
@@ -134,7 +128,7 @@ class Home extends Component {
           <AppBar position="fixed" className={classes.appBar}>
             <Toolbar>
               <Typography variant="h6" noWrap>
-                TodoApp
+                {'TodoApp'}
               </Typography>
             </Toolbar>
           </AppBar>
@@ -146,11 +140,8 @@ class Home extends Component {
             }}
           >
             <div className={classes.toolbar} />
-            <Divider />
             <div style={{ textAlign: 'center' }}>
-              <Avatar src={this.state.profilePicture} className={classes.avatar} />
               <p>
-                {' '}
                 {this.state.firstName} {this.state.lastName}
               </p>
             </div>

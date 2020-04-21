@@ -6,6 +6,7 @@ interface Todo {
   title: string;
   body: string;
   createdAt: string;
+  username: string;
 }
 
 type Todos = Array<Todo>;
@@ -28,6 +29,7 @@ export const getAllTodos = (request: UserRequest, response: Response) => {
         todos.push({
           todoId: doc.id,
           title: doc.data().title,
+          username: doc.data().username,
           body: doc.data().body,
           createdAt: doc.data().createdAt,
         });
@@ -38,6 +40,28 @@ export const getAllTodos = (request: UserRequest, response: Response) => {
     .catch(err => {
       console.error(err);
       return response.status(500).json({ error: err.code });
+    });
+};
+
+export const getOneTodo = (request: UserRequest, response: Response) => {
+  db.doc(`/todos/${request.params.todoId}`)
+    .get()
+    .then(doc => {
+      if (!doc.exists) {
+        return response.status(404).json({
+          error: 'Todo not found',
+        });
+      }
+      if (doc.data().username !== request.user.username) {
+        return response.status(403).json({ error: 'UnAuthorized' });
+      }
+      const TodoData = doc.data();
+      TodoData.todoId = doc.id;
+      return response.json(TodoData);
+    })
+    .catch(error => {
+      console.error(error);
+      return response.status(500).json({ error: error.code });
     });
 };
 

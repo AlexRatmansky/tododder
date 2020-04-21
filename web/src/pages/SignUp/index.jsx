@@ -10,7 +10,6 @@ import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 import withStyles from '@material-ui/core/styles/withStyles';
 import CircularProgress from '@material-ui/core/CircularProgress';
-
 import axios from 'axios';
 
 const styles = theme => ({
@@ -31,7 +30,7 @@ const styles = theme => ({
   submit: {
     margin: theme.spacing(3, 0, 2),
   },
-  progess: {
+  progress: {
     position: 'absolute',
   },
 });
@@ -250,13 +249,13 @@ class SignUp extends Component {
                 !this.state.phoneNumber
               }
             >
-              Sign Up
-              {loading && <CircularProgress size={30} className={classes.progess} />}
+              {'Sign Up'}
+              {loading && <CircularProgress size={30} className={classes.progress} />}
             </Button>
             <Grid container justify="flex-end">
               <Grid item>
-                <Link href="login" variant="body2">
-                  Already have an account? Sign in
+                <Link href="/login" variant="body2">
+                  {'Already have an account? Sign in'}
                 </Link>
               </Grid>
             </Grid>

@@ -10,7 +10,6 @@ import Typography from '@material-ui/core/Typography';
 import withStyles from '@material-ui/core/styles/withStyles';
 import Container from '@material-ui/core/Container';
 import CircularProgress from '@material-ui/core/CircularProgress';
-
 import axios from 'axios';
 
 const styles = theme => ({
@@ -54,10 +53,12 @@ class Login extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.UI.errors) {
-      this.setState({
-        errors: nextProps.UI.errors,
-      });
+    if ('errors' in nextProps.UI) {
+      if (nextProps.UI.errors) {
+        this.setState({
+          errors: nextProps.UI.errors,
+        });
+      }
     }
   }
 
@@ -116,7 +117,7 @@ class Login extends Component {
               autoComplete="email"
               autoFocus
               helperText={errors.email}
-              error={!!errors.email}
+              error={errors.email ? true : false}
               onChange={this.handleChange}
             />
             <TextField
@@ -130,7 +131,7 @@ class Login extends Component {
               id="password"
               autoComplete="current-password"
               helperText={errors.password}
-              error={!!errors.password}
+              error={errors.password ? true : false}
               onChange={this.handleChange}
             />
             <Button
@@ -143,7 +144,7 @@ class Login extends Component {
               disabled={loading || !this.state.email || !this.state.password}
             >
               Sign In
-              {loading && <CircularProgress size={30} className={classes.progess} />}
+              {loading && <CircularProgress size={30} className={classes.progress} />}
             </Button>
             <Grid container>
               <Grid item>
