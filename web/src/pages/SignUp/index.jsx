@@ -10,30 +10,7 @@ import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 import withStyles from '@material-ui/core/styles/withStyles';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import axios from 'axios';
-
-const styles = theme => ({
-  paper: {
-    marginTop: theme.spacing(8),
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
-  avatar: {
-    margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
-  },
-  form: {
-    width: '100%', // Fix IE 11 issue.
-    marginTop: theme.spacing(3),
-  },
-  submit: {
-    margin: theme.spacing(3, 0, 2),
-  },
-  progress: {
-    position: 'absolute',
-  },
-});
+import { styles } from './style';
 
 class SignUp extends Component {
   constructor(props) {
@@ -80,19 +57,32 @@ class SignUp extends Component {
       password: this.state.password,
       confirmPassword: this.state.confirmPassword,
     };
-    axios
-      .post('/signup', newUserData)
+
+    fetch('/signup', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(newUserData),
+    })
       .then(response => {
-        localStorage.setItem('AuthToken', `${response.data.token}`);
+        if (!response.ok) throw response;
+        return response.json();
+      })
+      .then(response => {
+        console.log(response);
+        localStorage.setItem('AuthToken', `Bearer ${response.token}`);
         this.setState({
           loading: false,
         });
         this.props.history.push('/');
       })
       .catch(error => {
-        this.setState({
-          errors: error.response.data,
-          loading: false,
+        error.json().then(errorMessage => {
+          this.setState({
+            errors: errorMessage,
+            loading: false,
+          });
         });
       });
   };
@@ -100,6 +90,9 @@ class SignUp extends Component {
   render() {
     const { classes } = this.props;
     const { errors, loading } = this.state;
+
+    console.log(this.state);
+
     return (
       <Container component="main" maxWidth="xs">
         <CssBaseline />
@@ -227,6 +220,8 @@ class SignUp extends Component {
                   type="password"
                   id="confirmPassword"
                   autoComplete="current-password"
+                  helperText={errors.confirmPassword}
+                  error={!!errors.confirmPassword}
                   onChange={this.handleChange}
                 />
               </Grid>

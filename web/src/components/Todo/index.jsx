@@ -1,15 +1,12 @@
 import React, { Component } from 'react';
-
 import withStyles from '@material-ui/core/styles/withStyles';
 import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
-import Slide from '@material-ui/core/Slide';
 import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
 import Card from '@material-ui/core/Card';
@@ -18,78 +15,9 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import CardContent from '@material-ui/core/CardContent';
 import MuiDialogTitle from '@material-ui/core/DialogTitle';
 import MuiDialogContent from '@material-ui/core/DialogContent';
-
-import axios from 'axios';
+import Button from '@material-ui/core/Button';
 import { authMiddleWare } from '../../util/auth';
-
-const styles = theme => ({
-  content: {
-    flexGrow: 1,
-    padding: theme.spacing(3),
-  },
-  appBar: {
-    position: 'relative',
-  },
-  title: {
-    marginLeft: theme.spacing(2),
-    flex: 1,
-  },
-  submitButton: {
-    display: 'block',
-    color: 'white',
-    textAlign: 'center',
-    position: 'absolute',
-    top: 14,
-    right: 10,
-  },
-  floatingButton: {
-    position: 'fixed',
-    bottom: 0,
-    right: 0,
-  },
-  form: {
-    width: '98%',
-    marginLeft: 13,
-    marginTop: theme.spacing(3),
-  },
-  toolbar: theme.mixins.toolbar,
-  root: {
-    minWidth: 470,
-  },
-  bullet: {
-    display: 'inline-block',
-    margin: '0 2px',
-    transform: 'scale(0.8)',
-  },
-  pos: {
-    marginBottom: 12,
-  },
-  uiProgress: {
-    position: 'fixed',
-    zIndex: '1000',
-    height: '31px',
-    width: '31px',
-    left: '50%',
-    top: '35%',
-  },
-  dialogeStyle: {
-    maxWidth: '50%',
-  },
-  viewRoot: {
-    margin: 0,
-    padding: theme.spacing(2),
-  },
-  closeButton: {
-    position: 'absolute',
-    right: theme.spacing(1),
-    top: theme.spacing(1),
-    color: theme.palette.grey[500],
-  },
-});
-
-const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
+import { styles } from './style';
 
 class Todo extends Component {
   constructor(props) {
@@ -121,12 +49,16 @@ class Todo extends Component {
   componentWillMount = () => {
     authMiddleWare(this.props.history);
     const authToken = localStorage.getItem('AuthToken');
-    axios.defaults.headers.common = { Authorization: `${authToken}` };
-    axios
-      .get('/todos')
+
+    fetch('/todos', {
+      headers: {
+        Authorization: authToken,
+      },
+    })
+      .then(response => response.json())
       .then(response => {
         this.setState({
-          todos: response.data,
+          todos: response,
           uiLoading: false,
         });
       })
@@ -138,10 +70,14 @@ class Todo extends Component {
   deleteTodoHandler(data) {
     authMiddleWare(this.props.history);
     const authToken = localStorage.getItem('AuthToken');
-    axios.defaults.headers.common = { Authorization: `${authToken}` };
     let todoId = data.todo.todoId;
-    axios
-      .delete(`todo/${todoId}`)
+
+    fetch(`todo/${todoId}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: authToken,
+      },
+    })
       .then(() => {
         window.location.reload();
       })
@@ -210,24 +146,17 @@ class Todo extends Component {
         body: this.state.body,
       };
 
-      let options = {};
-
-      if (this.state.buttonType === 'Edit') {
-        options = {
-          url: `/todo/${this.state.todoId}`,
-          method: 'put',
-          data: userTodo,
-        };
-      } else {
-        options = {
-          url: '/todo',
-          method: 'post',
-          data: userTodo,
-        };
-      }
       const authToken = localStorage.getItem('AuthToken');
-      axios.defaults.headers.common = { Authorization: `${authToken}` };
-      axios(options)
+
+      fetch(this.state.buttonType === 'Edit' ? `/todo/${this.state.todoId}` : '/todo', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: authToken,
+        },
+        body: JSON.stringify(userTodo),
+      })
+        .then(response => response.json())
         .then(() => {
           this.setState({ open: false });
           window.location.reload();
@@ -242,7 +171,7 @@ class Todo extends Component {
       this.setState({ viewOpen: false });
     };
 
-    const handleClose = event => {
+    const handleClose = () => {
       this.setState({ open: false });
     };
 
@@ -266,7 +195,7 @@ class Todo extends Component {
           >
             <AddCircleIcon style={{ fontSize: 60 }} />
           </IconButton>
-          <Dialog fullScreen open={open} onClose={handleClose} TransitionComponent={Transition}>
+          <Dialog fullScreen open={open} onClose={handleClose}>
             <AppBar className={classes.appBar}>
               <Toolbar>
                 <IconButton edge="start" color="inherit" onClick={handleClose} aria-label="close">
@@ -294,7 +223,7 @@ class Todo extends Component {
                     autoComplete="todoTitle"
                     helperText={errors.title}
                     value={this.state.title}
-                    error={errors.title ? true : false}
+                    error={!!errors.title}
                     onChange={this.handleChange}
                   />
                 </Grid>
@@ -311,7 +240,7 @@ class Todo extends Component {
                     rows={25}
                     rowsMax={25}
                     helperText={errors.body}
-                    error={errors.body ? true : false}
+                    error={!!errors.body}
                     onChange={this.handleChange}
                     value={this.state.body}
                   />

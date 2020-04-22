@@ -4,57 +4,8 @@ import withStyles from '@material-ui/core/styles/withStyles';
 import Typography from '@material-ui/core/Typography';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { Button, Card, CardActions, CardContent, Divider, Grid, TextField } from '@material-ui/core';
-
-import axios from 'axios';
 import { authMiddleWare } from '../../util/auth';
-
-const styles = theme => ({
-  content: {
-    flexGrow: 1,
-    padding: theme.spacing(3),
-  },
-  toolbar: theme.mixins.toolbar,
-  root: {},
-  details: {
-    display: 'flex',
-  },
-  avatar: {
-    height: 110,
-    width: 100,
-    flexShrink: 0,
-    flexGrow: 0,
-  },
-  locationText: {
-    paddingLeft: '15px',
-  },
-  buttonProperty: {
-    position: 'absolute',
-    top: '50%',
-  },
-  uiProgress: {
-    position: 'fixed',
-    zIndex: '1000',
-    height: '31px',
-    width: '31px',
-    left: '50%',
-    top: '35%',
-  },
-  progress: {
-    position: 'absolute',
-  },
-  uploadButton: {
-    marginLeft: '8px',
-    margin: theme.spacing(1),
-  },
-  customError: {
-    color: 'red',
-    fontSize: '0.8rem',
-    marginTop: 10,
-  },
-  submitButton: {
-    marginTop: '10px',
-  },
-});
+import { styles } from './style';
 
 class Account extends Component {
   constructor(props) {
@@ -76,23 +27,27 @@ class Account extends Component {
   componentWillMount = () => {
     authMiddleWare(this.props.history);
     const authToken = localStorage.getItem('AuthToken');
-    axios.defaults.headers.common = { Authorization: `${authToken}` };
-    axios
-      .get('/user')
+
+    fetch('/user', {
+      headers: {
+        Authorization: authToken,
+      },
+    })
+      .then(response => response.json())
       .then(response => {
-        console.log(response.data);
+        console.log(response);
         this.setState({
-          firstName: response.data.userCredentials.firstName,
-          lastName: response.data.userCredentials.lastName,
-          email: response.data.userCredentials.email,
-          phoneNumber: response.data.userCredentials.phoneNumber,
-          country: response.data.userCredentials.country,
-          username: response.data.userCredentials.username,
+          firstName: response.userCredentials.firstName,
+          lastName: response.userCredentials.lastName,
+          email: response.userCredentials.email,
+          phoneNumber: response.userCredentials.phoneNumber,
+          country: response.userCredentials.country,
+          username: response.userCredentials.username,
           uiLoading: false,
         });
       })
       .catch(error => {
-        if (error.response.status === 403) {
+        if (error.status === 403) {
           this.props.history.push('/login');
         }
         console.log(error);
@@ -111,19 +66,27 @@ class Account extends Component {
     this.setState({ buttonLoading: true });
     authMiddleWare(this.props.history);
     const authToken = localStorage.getItem('AuthToken');
-    axios.defaults.headers.common = { Authorization: `${authToken}` };
+
     const formRequest = {
       firstName: this.state.firstName,
       lastName: this.state.lastName,
       country: this.state.country,
     };
-    axios
-      .post('/user', formRequest)
+
+    fetch('/user', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: authToken,
+      },
+      body: JSON.stringify(formRequest),
+    })
+      .then(response => response.json())
       .then(() => {
         this.setState({ buttonLoading: false });
       })
       .catch(error => {
-        if (error.response.status === 403) {
+        if (error.status === 403) {
           this.props.history.push('/login');
         }
         console.log(error);

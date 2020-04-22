@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import axios from 'axios';
 import Account from '../../components/Account';
 import Todo from '../../components/Todo';
 import Drawer from '@material-ui/core/Drawer';
@@ -18,44 +17,7 @@ import NotesIcon from '@material-ui/icons/Notes';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { authMiddleWare } from '../../util/auth';
-
-const drawerWidth = 240;
-
-const styles = theme => ({
-  root: {
-    display: 'flex',
-  },
-  appBar: {
-    zIndex: theme.zIndex.drawer + 1,
-  },
-  drawer: {
-    width: drawerWidth,
-    flexShrink: 0,
-  },
-  drawerPaper: {
-    width: drawerWidth,
-  },
-  content: {
-    flexGrow: 1,
-    padding: theme.spacing(3),
-  },
-  avatar: {
-    height: 110,
-    width: 100,
-    flexShrink: 0,
-    flexGrow: 0,
-    marginTop: 20,
-  },
-  uiProgress: {
-    position: 'fixed',
-    zIndex: '1000',
-    height: '31px',
-    width: '31px',
-    left: '45%',
-    top: '35%',
-  },
-  toolbar: theme.mixins.toolbar,
-});
+import { styles } from './style';
 
 class Home extends Component {
   state = {
@@ -89,23 +51,27 @@ class Home extends Component {
   componentWillMount = () => {
     authMiddleWare(this.props.history);
     const authToken = localStorage.getItem('AuthToken');
-    axios.defaults.headers.common = { Authorization: `${authToken}` };
-    axios
-      .get('/user')
+
+    fetch('/user', {
+      headers: {
+        Authorization: authToken,
+      },
+    })
+      .then(response => response.json())
       .then(response => {
-        console.log(response.data);
+        console.log(response);
         this.setState({
-          firstName: response.data.userCredentials.firstName,
-          lastName: response.data.userCredentials.lastName,
-          email: response.data.userCredentials.email,
-          phoneNumber: response.data.userCredentials.phoneNumber,
-          country: response.data.userCredentials.country,
-          username: response.data.userCredentials.username,
+          firstName: response.userCredentials.firstName,
+          lastName: response.userCredentials.lastName,
+          email: response.userCredentials.email,
+          phoneNumber: response.userCredentials.phoneNumber,
+          country: response.userCredentials.country,
+          username: response.userCredentials.username,
           uiLoading: false,
         });
       })
       .catch(error => {
-        if (error.response.status === 403) {
+        if (error.status === 403) {
           this.props.history.push('/login');
         }
         console.log(error);
