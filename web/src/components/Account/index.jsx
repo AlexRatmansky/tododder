@@ -1,31 +1,21 @@
-import React, { Component } from 'react'
-
-import withStyles from '@material-ui/core/styles/withStyles'
-import Typography from '@material-ui/core/Typography'
-import CircularProgress from '@material-ui/core/CircularProgress'
-import { Button, Card, CardActions, CardContent, Divider, Grid, TextField } from '@material-ui/core'
+import React, { useEffect, useState } from 'react'
 import { authMiddleWare } from '../../util/auth'
-import { styles } from './style'
+import { Button, Card, FormGroup, H1, InputGroup, Spinner } from '@blueprintjs/core'
 
-class Account extends Component {
-  constructor(props) {
-    super(props)
+export const Account = props => {
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
+  const [email, setEmail] = useState('')
+  const [phoneNumber, setPhoneNumber] = useState('')
+  const [username, setUsername] = useState('')
+  const [country, setCountry] = useState('')
+  const [uiLoading, setUiLoading] = useState(true)
+  const [buttonLoading, setButtonLoading] = useState(false)
+  const [errorMsg, setErrorMsg] = useState('')
 
-    this.state = {
-      firstName: '',
-      lastName: '',
-      email: '',
-      phoneNumber: '',
-      username: '',
-      country: '',
-      uiLoading: true,
-      buttonLoading: false,
-      imageError: '',
-    }
-  }
+  useEffect(() => {
+    authMiddleWare(props.history)
 
-  componentWillMount = () => {
-    authMiddleWare(this.props.history)
     const authToken = localStorage.getItem('AuthToken')
 
     fetch('/user', {
@@ -35,43 +25,52 @@ class Account extends Component {
     })
       .then(response => response.json())
       .then(response => {
-        console.log(response)
-        this.setState({
-          firstName: response.userCredentials.firstName,
-          lastName: response.userCredentials.lastName,
-          email: response.userCredentials.email,
-          phoneNumber: response.userCredentials.phoneNumber,
-          country: response.userCredentials.country,
-          username: response.userCredentials.username,
-          uiLoading: false,
-        })
+        setFirstName(response.userCredentials.firstName)
+        setLastName(response.userCredentials.lastName)
+        setEmail(response.userCredentials.email)
+        setPhoneNumber(response.userCredentials.phoneNumber)
+        setCountry(response.userCredentials.country)
+        setUsername(response.userCredentials.username)
+        setUiLoading(false)
       })
       .catch(error => {
         if (error.status === 403) {
-          this.props.history.push('/login')
+          props.history.push('/login')
         }
         console.log(error)
-        this.setState({ errorMsg: 'Error in retrieving the data' })
+        setErrorMsg('Error in retrieving the data')
       })
+  }, [props.history])
+
+  const handleChangeFirstName = event => {
+    setFirstName(event.target.value)
+  }
+  const handleChangeLastName = event => {
+    setLastName(event.target.value)
+  }
+  const handleChangeEmail = event => {
+    setEmail(event.target.value)
+  }
+  const handleChangePhoneNumber = event => {
+    setPhoneNumber(event.target.value)
+  }
+  const handleChangeUsername = event => {
+    setUsername(event.target.value)
+  }
+  const handleChangeCountry = event => {
+    setCountry(event.target.value)
   }
 
-  handleChange = event => {
-    this.setState({
-      [event.target.name]: event.target.value,
-    })
-  }
-
-  updateFormValues = event => {
+  const updateFormValues = event => {
     event.preventDefault()
-    this.setState({ buttonLoading: true })
-    authMiddleWare(this.props.history)
+
+    setButtonLoading(true)
+
+    authMiddleWare(props.history)
+
     const authToken = localStorage.getItem('AuthToken')
 
-    const formRequest = {
-      firstName: this.state.firstName,
-      lastName: this.state.lastName,
-      country: this.state.country,
-    }
+    const formRequest = { firstName, lastName, country }
 
     fetch('/user', {
       method: 'POST',
@@ -83,143 +82,86 @@ class Account extends Component {
     })
       .then(response => response.json())
       .then(() => {
-        this.setState({ buttonLoading: false })
+        setButtonLoading(false)
       })
       .catch(error => {
-        if (error.status === 403) {
-          this.props.history.push('/login')
-        }
         console.log(error)
-        this.setState({
-          buttonLoading: false,
-        })
+        if (error.status === 403) {
+          props.history.push('/login')
+        }
+        setButtonLoading(false)
       })
   }
 
-  render() {
-    const { classes, ...rest } = this.props
-    if (this.state.uiLoading === true) {
-      return (
-        <main className={classes.content}>
-          <div className={classes.toolbar} />
-          {this.state.uiLoading && <CircularProgress size={150} className={classes.uiProgress} />}
-        </main>
-      )
-    } else {
-      return (
-        <main className={classes.content}>
-          <div className={classes.toolbar} />
-          <Card {...rest} className={classes.root}>
-            <CardContent>
-              <div className={classes.details}>
-                <div>
-                  <Typography className={classes.locationText} gutterBottom variant="h4">
-                    {this.state.firstName} {this.state.lastName}
-                  </Typography>
-                </div>
-              </div>
-              <div className={classes.progress} />
-            </CardContent>
-            <Divider />
-          </Card>
+  return uiLoading ? (
+    <Spinner size={150} />
+  ) : (
+    <div>
+      <H1>
+        {firstName} {lastName}
+      </H1>
 
-          <br />
-          <Card {...rest} className={classes.root}>
-            <form autoComplete="off" noValidate>
-              <Divider />
-              <CardContent>
-                <Grid container spacing={3}>
-                  <Grid item md={6} xs={12}>
-                    <TextField
-                      fullWidth
-                      label="First name"
-                      margin="dense"
-                      name="firstName"
-                      variant="outlined"
-                      value={this.state.firstName}
-                      onChange={this.handleChange}
-                    />
-                  </Grid>
-                  <Grid item md={6} xs={12}>
-                    <TextField
-                      fullWidth
-                      label="Last name"
-                      margin="dense"
-                      name="lastName"
-                      variant="outlined"
-                      value={this.state.lastName}
-                      onChange={this.handleChange}
-                    />
-                  </Grid>
-                  <Grid item md={6} xs={12}>
-                    <TextField
-                      fullWidth
-                      label="Email"
-                      margin="dense"
-                      name="email"
-                      variant="outlined"
-                      disabled={true}
-                      value={this.state.email}
-                      onChange={this.handleChange}
-                    />
-                  </Grid>
-                  <Grid item md={6} xs={12}>
-                    <TextField
-                      fullWidth
-                      label="Phone Number"
-                      margin="dense"
-                      name="phone"
-                      type="number"
-                      variant="outlined"
-                      disabled={true}
-                      value={this.state.phoneNumber}
-                      onChange={this.handleChange}
-                    />
-                  </Grid>
-                  <Grid item md={6} xs={12}>
-                    <TextField
-                      fullWidth
-                      label="User Name"
-                      margin="dense"
-                      name="userHandle"
-                      disabled={true}
-                      variant="outlined"
-                      value={this.state.username}
-                      onChange={this.handleChange}
-                    />
-                  </Grid>
-                  <Grid item md={6} xs={12}>
-                    <TextField
-                      fullWidth
-                      label="Country"
-                      margin="dense"
-                      name="country"
-                      variant="outlined"
-                      value={this.state.country}
-                      onChange={this.handleChange}
-                    />
-                  </Grid>
-                </Grid>
-              </CardContent>
-              <Divider />
-              <CardActions />
-            </form>
-          </Card>
-          <Button
-            color="primary"
-            variant="contained"
-            type="submit"
-            className={classes.submitButton}
-            onClick={this.updateFormValues}
-            disabled={this.state.buttonLoading || !this.state.firstName || !this.state.lastName || !this.state.country}
-          >
-            {'Save details'}
-            {this.state.buttonLoading && <CircularProgress size={30} className={classes.progress} />}
-          </Button>
-        </main>
-      )
-    }
-  }
+      <Card>
+        <form>
+          <FormGroup label={'First Name'} labelFor={'firstName'}>
+            <InputGroup
+              id={'firstName'}
+              name={'firstName'}
+              value={firstName}
+              required
+              onChange={handleChangeFirstName}
+            />
+          </FormGroup>
+          <FormGroup label={'Last Name'} labelFor={'lastName'}>
+            <InputGroup id={'lastName'} name={'lastName'} value={lastName} required onChange={handleChangeLastName} />
+          </FormGroup>
+          <FormGroup label={'Email Address'} labelFor={'email'}>
+            <InputGroup
+              id={'email'}
+              name={'email'}
+              value={email}
+              autoComplete={'email'}
+              disabled
+              required
+              onChange={handleChangeEmail}
+            />
+          </FormGroup>
+          <FormGroup label={'Phone'} labelFor={'phoneNumber'}>
+            <InputGroup
+              id={'phoneNumber'}
+              name={'phoneNumber'}
+              value={phoneNumber}
+              pattern={'[7-9]{1}[0-9]{9}'}
+              required
+              disabled
+              onChange={handleChangePhoneNumber}
+            />
+          </FormGroup>
+          <FormGroup label={'User Name'} labelFor={'username'}>
+            <InputGroup
+              id={'username'}
+              name={'username'}
+              value={username}
+              required
+              disabled
+              onChange={handleChangeUsername}
+            />
+          </FormGroup>
+          <FormGroup label={'Country'} labelFor={'country'}>
+            <InputGroup id={'country'} name={'country'} value={country} required onChange={handleChangeCountry} />
+          </FormGroup>
+        </form>
+      </Card>
+      <Button
+        type="submit"
+        onClick={updateFormValues}
+        disabled={!(firstName && lastName && country) || buttonLoading}
+        loading={buttonLoading}
+      >
+        {'Save details'}
+      </Button>
+
+      {errorMsg && <p>{errorMsg}</p>}
+    </div>
+  )
 }
-
-export default withStyles(styles)(Account)

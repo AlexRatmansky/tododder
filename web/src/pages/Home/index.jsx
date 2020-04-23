@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
-import Account from '../../components/Account'
+import { Account } from '../../components/Account'
 import { Todo } from '../../components/Todo'
 import { authMiddleWare } from '../../util/auth'
-import { Button, Navbar, Classes, NavbarDivider, NavbarGroup, NavbarHeading, Spinner } from '@blueprintjs/core'
+import { Button, Classes, Navbar, NavbarDivider, NavbarGroup, NavbarHeading, Spinner } from '@blueprintjs/core'
 
 export const Home = props => {
   const [render, setRender] = useState(false)
@@ -26,7 +26,6 @@ export const Home = props => {
         return response.json()
       })
       .then(response => {
-        console.log(response)
         setFirstName(response.userCredentials.firstName)
         setLastName(response.userCredentials.lastName)
         setUiLoading(false)

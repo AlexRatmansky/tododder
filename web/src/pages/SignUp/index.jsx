@@ -71,7 +71,6 @@ export const SignUp = props => {
         return response.json()
       })
       .then(response => {
-        console.log(response)
         localStorage.setItem('AuthToken', `Bearer ${response.token}`)
         setLoading(false)
         props.history.push('/')
@@ -98,6 +97,7 @@ export const SignUp = props => {
           <InputGroup
             id={'firstName'}
             name={'firstName'}
+            value={firstName}
             required
             intent={errors.firstName ? Intent.DANGER : Intent.NONE}
             onChange={handleChangeFirstName}
@@ -112,6 +112,7 @@ export const SignUp = props => {
           <InputGroup
             id={'lastName'}
             name={'lastName'}
+            value={lastName}
             required
             intent={errors.lastName ? Intent.DANGER : Intent.NONE}
             onChange={handleChangeLastName}
@@ -126,6 +127,7 @@ export const SignUp = props => {
           <InputGroup
             id={'username'}
             name={'username'}
+            value={username}
             required
             intent={errors.username ? Intent.DANGER : Intent.NONE}
             onChange={handleChangeUsername}
@@ -140,6 +142,7 @@ export const SignUp = props => {
           <InputGroup
             id={'phoneNumber'}
             name={'phoneNumber'}
+            value={phoneNumber}
             pattern={'[7-9]{1}[0-9]{9}'}
             required
             intent={errors.phoneNumber ? Intent.DANGER : Intent.NONE}
@@ -155,6 +158,7 @@ export const SignUp = props => {
           <InputGroup
             id={'email'}
             name={'email'}
+            value={email}
             autoComplete={'email'}
             required
             intent={errors.email ? Intent.DANGER : Intent.NONE}
@@ -170,6 +174,7 @@ export const SignUp = props => {
           <InputGroup
             id={'country'}
             name={'country'}
+            value={country}
             required
             intent={errors.country ? Intent.DANGER : Intent.NONE}
             onChange={handleChangeCountry}
@@ -184,6 +189,7 @@ export const SignUp = props => {
           <InputGroup
             id={'password'}
             name={'password'}
+            value={password}
             required
             type={'password'}
             autoComplete={'current-password'}
@@ -200,6 +206,7 @@ export const SignUp = props => {
           <InputGroup
             id={'confirmPassword'}
             name={'confirmPassword'}
+            value={confirmPassword}
             required
             type={'password'}
             autoComplete="current-password"
