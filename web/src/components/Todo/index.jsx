@@ -1,27 +1,27 @@
-import React, { Component } from 'react';
-import withStyles from '@material-ui/core/styles/withStyles';
-import Typography from '@material-ui/core/Typography';
-import Dialog from '@material-ui/core/Dialog';
-import AddCircleIcon from '@material-ui/icons/AddCircle';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import IconButton from '@material-ui/core/IconButton';
-import CloseIcon from '@material-ui/icons/Close';
-import TextField from '@material-ui/core/TextField';
-import Grid from '@material-ui/core/Grid';
-import Card from '@material-ui/core/Card';
-import CardActions from '@material-ui/core/CardActions';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import CardContent from '@material-ui/core/CardContent';
-import MuiDialogTitle from '@material-ui/core/DialogTitle';
-import MuiDialogContent from '@material-ui/core/DialogContent';
-import Button from '@material-ui/core/Button';
-import { authMiddleWare } from '../../util/auth';
-import { styles } from './style';
+import React, { Component } from 'react'
+import withStyles from '@material-ui/core/styles/withStyles'
+import Typography from '@material-ui/core/Typography'
+import Dialog from '@material-ui/core/Dialog'
+import AddCircleIcon from '@material-ui/icons/AddCircle'
+import AppBar from '@material-ui/core/AppBar'
+import Toolbar from '@material-ui/core/Toolbar'
+import IconButton from '@material-ui/core/IconButton'
+import CloseIcon from '@material-ui/icons/Close'
+import TextField from '@material-ui/core/TextField'
+import Grid from '@material-ui/core/Grid'
+import Card from '@material-ui/core/Card'
+import CardActions from '@material-ui/core/CardActions'
+import CircularProgress from '@material-ui/core/CircularProgress'
+import CardContent from '@material-ui/core/CardContent'
+import MuiDialogTitle from '@material-ui/core/DialogTitle'
+import MuiDialogContent from '@material-ui/core/DialogContent'
+import Button from '@material-ui/core/Button'
+import { authMiddleWare } from '../../util/auth'
+import { styles } from './style'
 
 class Todo extends Component {
   constructor(props) {
-    super(props);
+    super(props)
 
     this.state = {
       todos: '',
@@ -33,22 +33,22 @@ class Todo extends Component {
       uiLoading: true,
       buttonType: '',
       viewOpen: false,
-    };
+    }
 
-    this.deleteTodoHandler = this.deleteTodoHandler.bind(this);
-    this.handleEditClickOpen = this.handleEditClickOpen.bind(this);
-    this.handleViewOpen = this.handleViewOpen.bind(this);
+    this.deleteTodoHandler = this.deleteTodoHandler.bind(this)
+    this.handleEditClickOpen = this.handleEditClickOpen.bind(this)
+    this.handleViewOpen = this.handleViewOpen.bind(this)
   }
 
   handleChange = event => {
     this.setState({
       [event.target.name]: event.target.value,
-    });
-  };
+    })
+  }
 
   componentWillMount = () => {
-    authMiddleWare(this.props.history);
-    const authToken = localStorage.getItem('AuthToken');
+    authMiddleWare(this.props.history)
+    const authToken = localStorage.getItem('AuthToken')
 
     fetch('/todos', {
       headers: {
@@ -60,17 +60,17 @@ class Todo extends Component {
         this.setState({
           todos: response,
           uiLoading: false,
-        });
+        })
       })
       .catch(err => {
-        console.log(err);
-      });
-  };
+        console.log(err)
+      })
+  }
 
   deleteTodoHandler(data) {
-    authMiddleWare(this.props.history);
-    const authToken = localStorage.getItem('AuthToken');
-    let todoId = data.todo.todoId;
+    authMiddleWare(this.props.history)
+    const authToken = localStorage.getItem('AuthToken')
+    let todoId = data.todo.todoId
 
     fetch(`todo/${todoId}`, {
       method: 'DELETE',
@@ -79,11 +79,11 @@ class Todo extends Component {
       },
     })
       .then(() => {
-        window.location.reload();
+        window.location.reload()
       })
       .catch(err => {
-        console.log(err);
-      });
+        console.log(err)
+      })
   }
 
   handleEditClickOpen(data) {
@@ -93,7 +93,7 @@ class Todo extends Component {
       todoId: data.todo.todoId,
       buttonType: 'Edit',
       open: true,
-    });
+    })
   }
 
   handleViewOpen(data) {
@@ -101,12 +101,12 @@ class Todo extends Component {
       title: data.todo.title,
       body: data.todo.body,
       viewOpen: true,
-    });
+    })
   }
 
   render() {
     const DialogTitle = withStyles(styles)(props => {
-      const { children, classes, onClose, ...other } = props;
+      const { children, classes, onClose, ...other } = props
       return (
         <MuiDialogTitle disableTypography className={classes.root} {...other}>
           <Typography variant="h6">{children}</Typography>
@@ -116,17 +116,17 @@ class Todo extends Component {
             </IconButton>
           ) : null}
         </MuiDialogTitle>
-      );
-    });
+      )
+    })
 
     const DialogContent = withStyles(theme => ({
       viewRoot: {
         padding: theme.spacing(2),
       },
-    }))(MuiDialogContent);
+    }))(MuiDialogContent)
 
-    const { classes } = this.props;
-    const { open, errors, viewOpen } = this.state;
+    const { classes } = this.props
+    const { open, errors, viewOpen } = this.state
 
     const handleClickOpen = () => {
       this.setState({
@@ -135,18 +135,18 @@ class Todo extends Component {
         body: '',
         buttonType: '',
         open: true,
-      });
-    };
+      })
+    }
 
     const handleSubmit = event => {
-      authMiddleWare(this.props.history);
-      event.preventDefault();
+      authMiddleWare(this.props.history)
+      event.preventDefault()
       const userTodo = {
         title: this.state.title,
         body: this.state.body,
-      };
+      }
 
-      const authToken = localStorage.getItem('AuthToken');
+      const authToken = localStorage.getItem('AuthToken')
 
       fetch(this.state.buttonType === 'Edit' ? `/todo/${this.state.todoId}` : '/todo', {
         method: 'POST',
@@ -158,22 +158,22 @@ class Todo extends Component {
       })
         .then(response => response.json())
         .then(() => {
-          this.setState({ open: false });
-          window.location.reload();
+          this.setState({ open: false })
+          window.location.reload()
         })
         .catch(error => {
-          this.setState({ open: true, errors: error.response.data });
-          console.log(error);
-        });
-    };
+          this.setState({ open: true, errors: error.response.data })
+          console.log(error)
+        })
+    }
 
     const handleViewClose = () => {
-      this.setState({ viewOpen: false });
-    };
+      this.setState({ viewOpen: false })
+    }
 
     const handleClose = () => {
-      this.setState({ open: false });
-    };
+      this.setState({ open: false })
+    }
 
     if (this.state.uiLoading === true) {
       return (
@@ -181,7 +181,7 @@ class Todo extends Component {
           <div className={classes.toolbar} />
           {this.state.uiLoading && <CircularProgress size={150} className={classes.uiProgress} />}
         </main>
-      );
+      )
     } else {
       return (
         <main className={classes.content}>
@@ -308,9 +308,9 @@ class Todo extends Component {
             </DialogContent>
           </Dialog>
         </main>
-      );
+      )
     }
   }
 }
 
-export default withStyles(styles)(Todo);
+export default withStyles(styles)(Todo)

@@ -1,10 +1,10 @@
-import React from 'react';
+import React from 'react'
 
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import './App.css';
-import Login from './pages/Login';
-import SignUp from './pages/SignUp';
-import Home from './pages/Home';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
+import './App.css'
+import { Home } from './pages/Home'
+import { Login } from './pages/Login'
+import { SignUp } from './pages/SignUp'
 
 function App() {
   return (
@@ -17,7 +17,7 @@ function App() {
         </Switch>
       </div>
     </Router>
-  );
+  )
 }
 
-export default App;
+export default App

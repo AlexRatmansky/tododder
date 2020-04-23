@@ -1,62 +1,63 @@
-import React, { Component } from 'react';
-import Avatar from '@material-ui/core/Avatar';
-import Button from '@material-ui/core/Button';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import TextField from '@material-ui/core/TextField';
-import Link from '@material-ui/core/Link';
-import Grid from '@material-ui/core/Grid';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import Typography from '@material-ui/core/Typography';
-import Container from '@material-ui/core/Container';
-import withStyles from '@material-ui/core/styles/withStyles';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import { styles } from './style';
+import React, { useState } from 'react'
+import { Button, Card, FormGroup, H1, InputGroup, Intent, Text } from '@blueprintjs/core'
 
-class SignUp extends Component {
-  constructor(props) {
-    super(props);
+export const SignUp = props => {
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
+  const [phoneNumber, setPhoneNumber] = useState('')
+  const [country, setCountry] = useState('')
+  const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [errors, setErrors] = useState({})
+  const [loading, setLoading] = useState(false)
 
-    this.state = {
-      firstName: '',
-      lastName: '',
-      phoneNumber: '',
-      country: '',
-      username: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
-      errors: [],
-      loading: false,
-    };
+  const handleChangeFirstName = event => {
+    setFirstName(event.target.value)
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.UI.errors) {
-      this.setState({
-        errors: nextProps.UI.errors,
-      });
-    }
+  const handleChangeLastName = event => {
+    setLastName(event.target.value)
   }
 
-  handleChange = event => {
-    this.setState({
-      [event.target.name]: event.target.value,
-    });
-  };
+  const handleChangePhoneNumber = event => {
+    setPhoneNumber(event.target.value)
+  }
 
-  handleSubmit = event => {
-    event.preventDefault();
-    this.setState({ loading: true });
+  const handleChangeCountry = event => {
+    setCountry(event.target.value)
+  }
+
+  const handleChangeUsername = event => {
+    setUsername(event.target.value)
+  }
+
+  const handleChangeEmail = event => {
+    setEmail(event.target.value)
+  }
+
+  const handleChangePassword = event => {
+    setPassword(event.target.value)
+  }
+
+  const handleChangeConfirmPassword = event => {
+    setConfirmPassword(event.target.value)
+  }
+
+  const handleSubmit = event => {
+    event.preventDefault()
+    setLoading(true)
     const newUserData = {
-      firstName: this.state.firstName,
-      lastName: this.state.lastName,
-      phoneNumber: this.state.phoneNumber,
-      country: this.state.country,
-      username: this.state.username,
-      email: this.state.email,
-      password: this.state.password,
-      confirmPassword: this.state.confirmPassword,
-    };
+      firstName,
+      lastName,
+      phoneNumber,
+      country,
+      username,
+      email,
+      password,
+      confirmPassword,
+    }
 
     fetch('/signup', {
       method: 'POST',
@@ -66,199 +67,159 @@ class SignUp extends Component {
       body: JSON.stringify(newUserData),
     })
       .then(response => {
-        if (!response.ok) throw response;
-        return response.json();
+        if (!response.ok) throw response
+        return response.json()
       })
       .then(response => {
-        console.log(response);
-        localStorage.setItem('AuthToken', `Bearer ${response.token}`);
-        this.setState({
-          loading: false,
-        });
-        this.props.history.push('/');
+        console.log(response)
+        localStorage.setItem('AuthToken', `Bearer ${response.token}`)
+        setLoading(false)
+        props.history.push('/')
       })
       .catch(error => {
         error.json().then(errorMessage => {
-          this.setState({
-            errors: errorMessage,
-            loading: false,
-          });
-        });
-      });
-  };
-
-  render() {
-    const { classes } = this.props;
-    const { errors, loading } = this.state;
-
-    console.log(this.state);
-
-    return (
-      <Container component="main" maxWidth="xs">
-        <CssBaseline />
-        <div className={classes.paper}>
-          <Avatar className={classes.avatar}>
-            <LockOutlinedIcon />
-          </Avatar>
-          <Typography component="h1" variant="h5">
-            Sign up
-          </Typography>
-          <form className={classes.form} noValidate>
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  variant="outlined"
-                  required
-                  fullWidth
-                  id="firstName"
-                  label="First Name"
-                  name="firstName"
-                  autoComplete="firstName"
-                  helperText={errors.firstName}
-                  error={!!errors.firstName}
-                  onChange={this.handleChange}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  variant="outlined"
-                  required
-                  fullWidth
-                  id="lastName"
-                  label="Last Name"
-                  name="lastName"
-                  autoComplete="lastName"
-                  helperText={errors.lastName}
-                  error={!!errors.lastName}
-                  onChange={this.handleChange}
-                />
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  variant="outlined"
-                  required
-                  fullWidth
-                  id="username"
-                  label="User Name"
-                  name="username"
-                  autoComplete="username"
-                  helperText={errors.username}
-                  error={!!errors.username}
-                  onChange={this.handleChange}
-                />
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  variant="outlined"
-                  required
-                  fullWidth
-                  id="phoneNumber"
-                  label="Phone Number"
-                  name="phoneNumber"
-                  autoComplete="phoneNumber"
-                  pattern="[7-9]{1}[0-9]{9}"
-                  helperText={errors.phoneNumber}
-                  error={!!errors.phoneNumber}
-                  onChange={this.handleChange}
-                />
-              </Grid>
-
-              <Grid item xs={12}>
-                <TextField
-                  variant="outlined"
-                  required
-                  fullWidth
-                  id="email"
-                  label="Email Address"
-                  name="email"
-                  autoComplete="email"
-                  helperText={errors.email}
-                  error={!!errors.email}
-                  onChange={this.handleChange}
-                />
-              </Grid>
-
-              <Grid item xs={12}>
-                <TextField
-                  variant="outlined"
-                  required
-                  fullWidth
-                  id="country"
-                  label="Country"
-                  name="country"
-                  autoComplete="country"
-                  helperText={errors.country}
-                  error={!!errors.country}
-                  onChange={this.handleChange}
-                />
-              </Grid>
-
-              <Grid item xs={12}>
-                <TextField
-                  variant="outlined"
-                  required
-                  fullWidth
-                  name="password"
-                  label="Password"
-                  type="password"
-                  id="password"
-                  autoComplete="current-password"
-                  helperText={errors.password}
-                  error={!!errors.password}
-                  onChange={this.handleChange}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  variant="outlined"
-                  required
-                  fullWidth
-                  name="confirmPassword"
-                  label="Confirm Password"
-                  type="password"
-                  id="confirmPassword"
-                  autoComplete="current-password"
-                  helperText={errors.confirmPassword}
-                  error={!!errors.confirmPassword}
-                  onChange={this.handleChange}
-                />
-              </Grid>
-            </Grid>
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              color="primary"
-              className={classes.submit}
-              onClick={this.handleSubmit}
-              disabled={
-                loading ||
-                !this.state.email ||
-                !this.state.password ||
-                !this.state.firstName ||
-                !this.state.lastName ||
-                !this.state.country ||
-                !this.state.username ||
-                !this.state.phoneNumber
-              }
-            >
-              {'Sign Up'}
-              {loading && <CircularProgress size={30} className={classes.progress} />}
-            </Button>
-            <Grid container justify="flex-end">
-              <Grid item>
-                <Link href="/login" variant="body2">
-                  {'Already have an account? Sign in'}
-                </Link>
-              </Grid>
-            </Grid>
-          </form>
-        </div>
-      </Container>
-    );
+          setErrors(errorMessage)
+          setLoading(false)
+        })
+      })
   }
-}
 
-export default withStyles(styles)(SignUp);
+  return (
+    <Card>
+      <H1>{'Sign up'}</H1>
+
+      <form>
+        <FormGroup
+          label={'First Name'}
+          labelFor={'firstName'}
+          intent={errors.firstName ? Intent.DANGER : Intent.NONE}
+          helperText={errors.firstName}
+        >
+          <InputGroup
+            id={'firstName'}
+            name={'firstName'}
+            required
+            intent={errors.firstName ? Intent.DANGER : Intent.NONE}
+            onChange={handleChangeFirstName}
+          />
+        </FormGroup>
+        <FormGroup
+          label={'Last Name'}
+          labelFor={'lastName'}
+          intent={errors.lastName ? Intent.DANGER : Intent.NONE}
+          helperText={errors.lastName}
+        >
+          <InputGroup
+            id={'lastName'}
+            name={'lastName'}
+            required
+            intent={errors.lastName ? Intent.DANGER : Intent.NONE}
+            onChange={handleChangeLastName}
+          />
+        </FormGroup>
+        <FormGroup
+          label={'User Name'}
+          labelFor={'username'}
+          intent={errors.username ? Intent.DANGER : Intent.NONE}
+          helperText={errors.username}
+        >
+          <InputGroup
+            id={'username'}
+            name={'username'}
+            required
+            intent={errors.username ? Intent.DANGER : Intent.NONE}
+            onChange={handleChangeUsername}
+          />
+        </FormGroup>
+        <FormGroup
+          label={'Phone'}
+          labelFor={'phoneNumber'}
+          intent={errors.phoneNumber ? Intent.DANGER : Intent.NONE}
+          helperText={errors.phoneNumber}
+        >
+          <InputGroup
+            id={'phoneNumber'}
+            name={'phoneNumber'}
+            pattern={'[7-9]{1}[0-9]{9}'}
+            required
+            intent={errors.phoneNumber ? Intent.DANGER : Intent.NONE}
+            onChange={handleChangePhoneNumber}
+          />
+        </FormGroup>
+        <FormGroup
+          label={'Email Address'}
+          labelFor={'email'}
+          intent={errors.email ? Intent.DANGER : Intent.NONE}
+          helperText={errors.email}
+        >
+          <InputGroup
+            id={'email'}
+            name={'email'}
+            autoComplete={'email'}
+            required
+            intent={errors.email ? Intent.DANGER : Intent.NONE}
+            onChange={handleChangeEmail}
+          />
+        </FormGroup>
+        <FormGroup
+          label={'Country'}
+          labelFor={'country'}
+          intent={errors.country ? Intent.DANGER : Intent.NONE}
+          helperText={errors.country}
+        >
+          <InputGroup
+            id={'country'}
+            name={'country'}
+            required
+            intent={errors.country ? Intent.DANGER : Intent.NONE}
+            onChange={handleChangeCountry}
+          />
+        </FormGroup>
+        <FormGroup
+          label={'Password'}
+          labelFor={'password'}
+          intent={errors.password ? Intent.DANGER : Intent.NONE}
+          helperText={errors.password}
+        >
+          <InputGroup
+            id={'password'}
+            name={'password'}
+            required
+            type={'password'}
+            autoComplete={'current-password'}
+            intent={errors.password ? Intent.DANGER : Intent.NONE}
+            onChange={handleChangePassword}
+          />
+        </FormGroup>
+        <FormGroup
+          label={'Confirm Password'}
+          labelFor={'confirmPassword'}
+          intent={errors.confirmPassword ? Intent.DANGER : Intent.NONE}
+          helperText={errors.confirmPassword}
+        >
+          <InputGroup
+            id={'confirmPassword'}
+            name={'confirmPassword'}
+            required
+            type={'password'}
+            autoComplete="current-password"
+            intent={errors.confirmPassword ? Intent.DANGER : Intent.NONE}
+            onChange={handleChangeConfirmPassword}
+          />
+        </FormGroup>
+        <Button
+          type="submit"
+          onClick={handleSubmit}
+          disabled={!(email && password && firstName && lastName && country && username && phoneNumber) || loading}
+          loading={loading}
+        >
+          {'Sign Up'}
+        </Button>{' '}
+        {errors.general && <Text>{errors.general}</Text>}
+      </form>
+      <div>
+        <a href={'/login'}>{'Already have an account? Sign in'}</a>
+      </div>
+    </Card>
+  )
+}
