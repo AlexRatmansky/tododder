@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import Account from '../../components/Account'
-import Todo from '../../components/Todo'
+import { Todo } from '../../components/Todo'
 import { authMiddleWare } from '../../util/auth'
 import { Button, Navbar, Classes, NavbarDivider, NavbarGroup, NavbarHeading, Spinner } from '@blueprintjs/core'
 
@@ -40,7 +40,7 @@ export const Home = props => {
           setErrorMsg({ errorMsg: 'Error in retrieving the data' })
         })
       })
-  }, [])
+  }, [props.history])
 
   const loadAccountPage = () => {
     setRender(true)

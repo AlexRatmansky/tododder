@@ -1,15 +1,15 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 
-import withStyles from '@material-ui/core/styles/withStyles';
-import Typography from '@material-ui/core/Typography';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import { Button, Card, CardActions, CardContent, Divider, Grid, TextField } from '@material-ui/core';
-import { authMiddleWare } from '../../util/auth';
-import { styles } from './style';
+import withStyles from '@material-ui/core/styles/withStyles'
+import Typography from '@material-ui/core/Typography'
+import CircularProgress from '@material-ui/core/CircularProgress'
+import { Button, Card, CardActions, CardContent, Divider, Grid, TextField } from '@material-ui/core'
+import { authMiddleWare } from '../../util/auth'
+import { styles } from './style'
 
 class Account extends Component {
   constructor(props) {
-    super(props);
+    super(props)
 
     this.state = {
       firstName: '',
@@ -21,12 +21,12 @@ class Account extends Component {
       uiLoading: true,
       buttonLoading: false,
       imageError: '',
-    };
+    }
   }
 
   componentWillMount = () => {
-    authMiddleWare(this.props.history);
-    const authToken = localStorage.getItem('AuthToken');
+    authMiddleWare(this.props.history)
+    const authToken = localStorage.getItem('AuthToken')
 
     fetch('/user', {
       headers: {
@@ -35,7 +35,7 @@ class Account extends Component {
     })
       .then(response => response.json())
       .then(response => {
-        console.log(response);
+        console.log(response)
         this.setState({
           firstName: response.userCredentials.firstName,
           lastName: response.userCredentials.lastName,
@@ -44,34 +44,34 @@ class Account extends Component {
           country: response.userCredentials.country,
           username: response.userCredentials.username,
           uiLoading: false,
-        });
+        })
       })
       .catch(error => {
         if (error.status === 403) {
-          this.props.history.push('/login');
+          this.props.history.push('/login')
         }
-        console.log(error);
-        this.setState({ errorMsg: 'Error in retrieving the data' });
-      });
-  };
+        console.log(error)
+        this.setState({ errorMsg: 'Error in retrieving the data' })
+      })
+  }
 
   handleChange = event => {
     this.setState({
       [event.target.name]: event.target.value,
-    });
-  };
+    })
+  }
 
   updateFormValues = event => {
-    event.preventDefault();
-    this.setState({ buttonLoading: true });
-    authMiddleWare(this.props.history);
-    const authToken = localStorage.getItem('AuthToken');
+    event.preventDefault()
+    this.setState({ buttonLoading: true })
+    authMiddleWare(this.props.history)
+    const authToken = localStorage.getItem('AuthToken')
 
     const formRequest = {
       firstName: this.state.firstName,
       lastName: this.state.lastName,
       country: this.state.country,
-    };
+    }
 
     fetch('/user', {
       method: 'POST',
@@ -83,28 +83,28 @@ class Account extends Component {
     })
       .then(response => response.json())
       .then(() => {
-        this.setState({ buttonLoading: false });
+        this.setState({ buttonLoading: false })
       })
       .catch(error => {
         if (error.status === 403) {
-          this.props.history.push('/login');
+          this.props.history.push('/login')
         }
-        console.log(error);
+        console.log(error)
         this.setState({
           buttonLoading: false,
-        });
-      });
-  };
+        })
+      })
+  }
 
   render() {
-    const { classes, ...rest } = this.props;
+    const { classes, ...rest } = this.props
     if (this.state.uiLoading === true) {
       return (
         <main className={classes.content}>
           <div className={classes.toolbar} />
           {this.state.uiLoading && <CircularProgress size={150} className={classes.uiProgress} />}
         </main>
-      );
+      )
     } else {
       return (
         <main className={classes.content}>
@@ -213,13 +213,13 @@ class Account extends Component {
             onClick={this.updateFormValues}
             disabled={this.state.buttonLoading || !this.state.firstName || !this.state.lastName || !this.state.country}
           >
-            Save details
+            {'Save details'}
             {this.state.buttonLoading && <CircularProgress size={30} className={classes.progress} />}
           </Button>
         </main>
-      );
+      )
     }
   }
 }
 
-export default withStyles(styles)(Account);
+export default withStyles(styles)(Account)
