@@ -39,5 +39,5 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "https://us-central1-tododder-c997e.cloudfunctions.net/api"
+  "proxy": "https://europe-west3-tododder-c997e.cloudfunctions.net/api"
 }
