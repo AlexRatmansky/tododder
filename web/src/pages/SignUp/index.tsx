@@ -1,7 +1,22 @@
-import React, { useState } from 'react'
 import { Button, Card, FormGroup, H1, InputGroup, Intent, Text } from '@blueprintjs/core'
+import React, { ChangeEvent, FC, MouseEvent, useState } from 'react'
+import { RouteComponentProps } from 'react-router'
 
-export const SignUp = props => {
+interface FormErrors {
+  firstName?: string
+  lastName?: string
+  phoneNumber?: string
+  country?: string
+  username?: string
+  email?: string
+  password?: string
+  confirmPassword?: string
+  general?: string
+}
+
+interface Props extends RouteComponentProps {}
+
+export const SignUp: FC<Props> = props => {
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [phoneNumber, setPhoneNumber] = useState('')
@@ -10,42 +25,42 @@ export const SignUp = props => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [errors, setErrors] = useState({})
+  const [errors, setErrors] = useState<FormErrors>({})
   const [loading, setLoading] = useState(false)
 
-  const handleChangeFirstName = event => {
+  const handleChangeFirstName = (event: ChangeEvent<HTMLInputElement>) => {
     setFirstName(event.target.value)
   }
 
-  const handleChangeLastName = event => {
+  const handleChangeLastName = (event: ChangeEvent<HTMLInputElement>) => {
     setLastName(event.target.value)
   }
 
-  const handleChangePhoneNumber = event => {
+  const handleChangePhoneNumber = (event: ChangeEvent<HTMLInputElement>) => {
     setPhoneNumber(event.target.value)
   }
 
-  const handleChangeCountry = event => {
+  const handleChangeCountry = (event: ChangeEvent<HTMLInputElement>) => {
     setCountry(event.target.value)
   }
 
-  const handleChangeUsername = event => {
+  const handleChangeUsername = (event: ChangeEvent<HTMLInputElement>) => {
     setUsername(event.target.value)
   }
 
-  const handleChangeEmail = event => {
+  const handleChangeEmail = (event: ChangeEvent<HTMLInputElement>) => {
     setEmail(event.target.value)
   }
 
-  const handleChangePassword = event => {
+  const handleChangePassword = (event: ChangeEvent<HTMLInputElement>) => {
     setPassword(event.target.value)
   }
 
-  const handleChangeConfirmPassword = event => {
+  const handleChangeConfirmPassword = (event: ChangeEvent<HTMLInputElement>) => {
     setConfirmPassword(event.target.value)
   }
 
-  const handleSubmit = event => {
+  const handleSubmit = (event: MouseEvent) => {
     event.preventDefault()
     setLoading(true)
     const newUserData = {
@@ -76,8 +91,8 @@ export const SignUp = props => {
         props.history.push('/')
       })
       .catch(error => {
-        error.json().then(errorMessage => {
-          setErrors(errorMessage)
+        error.json().then((errorMsg: FormErrors) => {
+          setErrors(errorMsg)
           setLoading(false)
         })
       })

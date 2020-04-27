@@ -1,8 +1,11 @@
-import React, { useEffect, useState } from 'react'
-import { authMiddleWare } from '../../util/auth'
 import { Button, Card, FormGroup, H1, InputGroup, Spinner } from '@blueprintjs/core'
+import React, { ChangeEvent, FC, MouseEvent, useEffect, useState } from 'react'
+import { RouteComponentProps } from 'react-router'
+import { authMiddleWare } from '../../util/auth'
 
-export const Account = props => {
+interface Props extends RouteComponentProps {}
+
+export const Account: FC<Props> = props => {
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
@@ -16,7 +19,7 @@ export const Account = props => {
   useEffect(() => {
     authMiddleWare(props.history)
 
-    const authToken = localStorage.getItem('AuthToken')
+    const authToken = localStorage.getItem('AuthToken') || ''
 
     fetch('/user', {
       headers: {
@@ -42,33 +45,33 @@ export const Account = props => {
       })
   }, [props.history])
 
-  const handleChangeFirstName = event => {
+  const handleChangeFirstName = (event: ChangeEvent<HTMLInputElement>) => {
     setFirstName(event.target.value)
   }
-  const handleChangeLastName = event => {
+  const handleChangeLastName = (event: ChangeEvent<HTMLInputElement>) => {
     setLastName(event.target.value)
   }
-  const handleChangeEmail = event => {
+  const handleChangeEmail = (event: ChangeEvent<HTMLInputElement>) => {
     setEmail(event.target.value)
   }
-  const handleChangePhoneNumber = event => {
+  const handleChangePhoneNumber = (event: ChangeEvent<HTMLInputElement>) => {
     setPhoneNumber(event.target.value)
   }
-  const handleChangeUsername = event => {
+  const handleChangeUsername = (event: ChangeEvent<HTMLInputElement>) => {
     setUsername(event.target.value)
   }
-  const handleChangeCountry = event => {
+  const handleChangeCountry = (event: ChangeEvent<HTMLInputElement>) => {
     setCountry(event.target.value)
   }
 
-  const updateFormValues = event => {
+  const updateFormValues = (event: MouseEvent) => {
     event.preventDefault()
 
     setButtonLoading(true)
 
     authMiddleWare(props.history)
 
-    const authToken = localStorage.getItem('AuthToken')
+    const authToken = localStorage.getItem('AuthToken') || ''
 
     const formRequest = { firstName, lastName, country }
 

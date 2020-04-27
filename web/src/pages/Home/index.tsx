@@ -1,20 +1,23 @@
-import React, { useEffect, useState } from 'react'
+import { Button, Classes, Navbar, NavbarDivider, NavbarGroup, NavbarHeading, Spinner } from '@blueprintjs/core'
+import React, { FC, useEffect, useState } from 'react'
+import { RouteComponentProps } from 'react-router'
 import { Account } from '../../components/Account'
 import { Todo } from '../../components/Todo'
 import { authMiddleWare } from '../../util/auth'
-import { Button, Classes, Navbar, NavbarDivider, NavbarGroup, NavbarHeading, Spinner } from '@blueprintjs/core'
 
-export const Home = props => {
+interface Props extends RouteComponentProps {}
+
+export const Home: FC<Props> = props => {
   const [render, setRender] = useState(false)
 
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [uiLoading, setUiLoading] = useState(true)
-  const [errorMsg, setErrorMsg] = useState({})
+  const [errorMsg, setErrorMsg] = useState('')
 
   useEffect(() => {
     authMiddleWare(props.history)
-    const authToken = localStorage.getItem('AuthToken')
+    const authToken: string = localStorage.getItem('AuthToken') || ''
 
     fetch('/user', {
       headers: {
@@ -33,10 +36,12 @@ export const Home = props => {
       .catch(error => {
         if (error.status === 403) {
           props.history.push('/login')
+          return
         }
-        error.json().then(errorMessage => {
+
+        error.json().then((errorMessage: Error) => {
           console.log(errorMessage)
-          setErrorMsg({ errorMsg: 'Error in retrieving the data' })
+          setErrorMsg('Error in retrieving the data')
         })
       })
   }, [props.history])
@@ -73,22 +78,9 @@ export const Home = props => {
         </NavbarGroup>
       </Navbar>
 
-      {errorMsg && (
-        <div>
-          {Object.keys(errorMsg).map(key => (
-            <div>
-              <div>
-                {'key:'} {key}
-              </div>
-              <div>
-                {'value:'} {errorMsg[key]}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+      {errorMsg && <p>{errorMsg}</p>}
 
-      <div>{render ? <Account /> : <Todo />}</div>
+      <div>{render ? <Account {...props} /> : <Todo {...props} />}</div>
     </div>
   )
 }

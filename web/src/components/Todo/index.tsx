@@ -1,13 +1,30 @@
-import React, { useEffect, useState } from 'react'
-import { authMiddleWare } from '../../util/auth'
 import { Button, Card, FormGroup, H1, H2, InputGroup, Intent, Spinner } from '@blueprintjs/core'
+import React, { ChangeEvent, FC, MouseEvent, useEffect, useState } from 'react'
+import { RouteComponentProps } from 'react-router'
+import { authMiddleWare } from '../../util/auth'
 
-export const Todo = props => {
-  const [todos, setTodos] = useState([])
+interface FormError {
+  title?: string
+  body?: string
+}
+
+interface Todo {
+  todoId: string
+  title: string
+  createdAt: string
+  body: string
+}
+
+type Todos = Array<Todo>
+
+interface Props extends RouteComponentProps {}
+
+export const Todo: FC<Props> = props => {
+  const [todos, setTodos] = useState<Todos>([])
   const [body, setBody] = useState('')
   const [title, setTitle] = useState('')
   const [todoId, setTodoId] = useState('')
-  const [errors, setErrors] = useState({})
+  const [errors, setErrors] = useState<FormError>({})
   const [open, setOpen] = useState(false)
   const [uiLoading, setUiLoading] = useState(true)
   const [buttonType, setButtonType] = useState('')
@@ -16,7 +33,7 @@ export const Todo = props => {
   useEffect(() => {
     authMiddleWare(props.history)
 
-    const authToken = localStorage.getItem('AuthToken')
+    const authToken = localStorage.getItem('AuthToken') || ''
 
     fetch('/todos', {
       headers: {
@@ -33,19 +50,20 @@ export const Todo = props => {
       })
   }, [props.history])
 
-  const handleChangeTitle = event => {
+  const handleChangeTitle = (event: ChangeEvent<HTMLInputElement>) => {
     setTitle(event.target.value)
   }
 
-  const handleChangeBody = event => {
+  const handleChangeBody = (event: ChangeEvent<HTMLInputElement>) => {
     setBody(event.target.value)
   }
 
-  const deleteTodoHandler = data => {
+  const deleteTodoHandler = (data: Todo) => {
     authMiddleWare(props.history)
-    const authToken = localStorage.getItem('AuthToken')
 
-    let todoId = data.todo.todoId
+    const authToken = localStorage.getItem('AuthToken') || ''
+
+    let todoId = data.todoId
 
     fetch(`todo/${todoId}`, {
       method: 'DELETE',
@@ -61,17 +79,17 @@ export const Todo = props => {
       })
   }
 
-  const handleEditClickOpen = data => {
-    setTitle(data.todo.title)
-    setBody(data.todo.body)
-    setTodoId(data.todo.todoId)
+  const handleEditClickOpen = (data: Todo) => {
+    setTitle(data.title)
+    setBody(data.body)
+    setTodoId(data.todoId)
     setButtonType('Edit')
     setOpen(true)
   }
 
-  const handleViewOpen = data => {
-    setTitle(data.todo.title)
-    setBody(data.todo.body)
+  const handleViewOpen = (data: Todo) => {
+    setTitle(data.title)
+    setBody(data.body)
     setViewOpen(true)
   }
 
@@ -83,14 +101,14 @@ export const Todo = props => {
     setOpen(true)
   }
 
-  const handleSubmit = event => {
+  const handleSubmit = (event: MouseEvent) => {
     event.preventDefault()
 
     authMiddleWare(props.history)
 
     const userTodo = { title, body }
 
-    const authToken = localStorage.getItem('AuthToken')
+    const authToken = localStorage.getItem('AuthToken') || ''
 
     fetch(buttonType === 'Edit' ? `/todo/${todoId}` : '/todo', {
       method: 'POST',
@@ -178,9 +196,9 @@ export const Todo = props => {
           <p>{todo.title}</p>
           <p>{todo.createdAt}</p>
           <p>{todo.body}</p>
-          <Button onClick={() => handleViewOpen({ todo })}>{'View'}</Button>
-          <Button onClick={() => handleEditClickOpen({ todo })}>{'Edit'}</Button>
-          <Button onClick={() => deleteTodoHandler({ todo })}>{'Delete'}</Button>
+          <Button onClick={() => handleViewOpen(todo)}>{'View'}</Button>
+          <Button onClick={() => handleEditClickOpen(todo)}>{'Edit'}</Button>
+          <Button onClick={() => deleteTodoHandler(todo)}>{'Delete'}</Button>
         </Card>
       ))}
 

@@ -1,20 +1,30 @@
-import React, { useState } from 'react'
+import React, { ChangeEvent, FC, MouseEvent, useState } from 'react'
 import { Button, Card, FormGroup, H1, InputGroup, Intent, Text } from '@blueprintjs/core'
 
-export const Login = props => {
+import { RouteComponentProps } from 'react-router'
+
+interface FormErrors {
+  email?: string
+  password?: string
+  general?: string
+}
+
+interface Props extends RouteComponentProps {}
+
+export const Login: FC<Props> = props => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [errors, setErrors] = useState({})
+  const [errors, setErrors] = useState<FormErrors>({})
   const [loading, setLoading] = useState(false)
 
-  const handleChangeEmail = event => {
+  const handleChangeEmail = (event: ChangeEvent<HTMLInputElement>) => {
     setEmail(event.target.value)
   }
-  const handleChangePassword = event => {
+  const handleChangePassword = (event: ChangeEvent<HTMLInputElement>) => {
     setPassword(event.target.value)
   }
 
-  const handleSubmit = event => {
+  const handleSubmit = (event: MouseEvent) => {
     event.preventDefault()
     setLoading(true)
     const userData = { email, password }
@@ -36,8 +46,8 @@ export const Login = props => {
         props.history.push('/')
       })
       .catch(error => {
-        error.json().then(errorMessage => {
-          setErrors(errorMessage)
+        error.json().then((errorMsg: FormErrors) => {
+          setErrors(errorMsg)
           setLoading(false)
         })
       })
